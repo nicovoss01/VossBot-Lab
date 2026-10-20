@@ -1,0 +1,2 @@
+# Serve the existing PWA manifest with its proper media type.
+AddType application/manifest+json .webmanifest
