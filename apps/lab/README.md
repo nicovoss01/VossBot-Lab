@@ -1,28 +1,23 @@
-# Sandbox Lab — Local UI Prototype
+# VoßFit Sandbox Lab
 
-This directory currently contains a standalone UI prototype in `index.html` plus a provider-neutral AI contract scaffold under `server/ai/`.
+The Lab prototype is connected to the existing Sandbox Firebase project and two dedicated Cloudflare Worker endpoints.
 
-## Prototype features
+- UI: `https://lab.xn--vofit-mqa.de`
+- Gemini API: `https://api.lab.xn--vofit-mqa.de` (Worker `vossfit-sandbox-api`)
+- Private file and conversation API: `https://files.lab.xn--vofit-mqa.de` (Worker `vossfit-sandbox-lab-files-api`)
+- R2 binding: `SANDBOX_FILES` → `vossfit-sandbox-lab-files-eu` (EU jurisdiction)
 
-- Responsive Lab navigation and overview dashboard.
-- Workbench for local experiment notes and local file metadata previews.
-- Demo task list with add/toggle interactions.
-- Conceptual Research, Build and QA agent cards.
-- VoßBot chat mock that does not call a model.
-- Systems, files and project-memory overview.
+## Implemented in the Lab runtime
 
-## Explicit limitations
+- Google sign-in through Firebase project `vossfit-sandbox`
+- Authenticated Gemini requests; Gemini credentials remain in Cloudflare Worker secrets
+- Owner-only upload/download/delete for supported documents, images, audio and video (25 MB per file)
+- Private conversation persistence in R2, scoped by Firebase user ID
+- Health endpoint and CORS restricted to the Sandbox Lab origin
+- Worker source and Wrangler configuration live alongside this app
 
-- Not connected to Firebase authentication, Gemini, Cloudflare R2, Spaceship, or a task database.
-- UI state is in-memory and disappears on reload.
-- File picker only displays metadata in the current page; it does not upload file bytes.
-- No code execution, filesystem write tool, or deployment function is exposed from this page.
-- No production source has been imported yet; this prototype must not be treated as the current live Lab.
+## Important
 
-## Local smoke test
-
-Open `index.html` directly in a modern browser. No build tool or package install is required. Verify navigation, adding/toggling tasks, creating a local experiment, selecting a file, and the demo chat. The JavaScript syntax was checked with Node.js on 2026-10-20.
-
-## Next integration gate
-
-Confirm the live Sandbox Lab source and backend/auth model first. Then port/reconcile the design with the real source, implement server-side authorization and Gemini adapter, add R2 only if appropriate to the verified hosting architecture, and test locally before requesting a Sandbox deployment approval.
+- The Firebase web config is client-side configuration, not the Gemini secret. Keep Firebase API restrictions and authorized domains limited to the Sandbox.
+- Never commit Gemini keys, Cloudflare API tokens, service-account JSON, or local `.env` files.
+- No official Project website was changed. DNS changes only added `api.lab.xn--vofit-mqa.de` and `files.lab.xn--vofit-mqa.de`.
