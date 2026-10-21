@@ -37,3 +37,6 @@ backups/
 
 # Official Project-only page; keep it out of the Sandbox repository.
 /android-login.html
+
+# Cloudflare local cache
+.wrangler/
