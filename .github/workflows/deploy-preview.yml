@@ -3,15 +3,31 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: "Which experiment to publish?"
+        description: "Preview target"
         required: true
         type: choice
         options: [homepage, lab]
+      source_dir:
+        description: "Optional custom source directory"
+        required: false
+        type: string
+      pages_project:
+        description: "Optional existing Cloudflare Pages project"
+        required: false
+        type: string
   workflow_call:
     inputs:
       target:
         required: true
         type: string
+      source_dir:
+        required: false
+        type: string
+        default: ""
+      pages_project:
+        required: false
+        type: string
+        default: ""
     secrets:
       CLOUDFLARE_API_TOKEN:
         required: true
@@ -20,11 +36,10 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: preview-${{ inputs.target }}
+  group: preview-${{ github.repository }}-${{ inputs.target }}
   cancel-in-progress: true
 jobs:
   publish:
-    if: ${{ inputs.target == 'homepage' || inputs.target == 'lab' }}
     runs-on: ubuntu-latest
     environment: sandbox-preview
     steps:
@@ -37,15 +52,20 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           TARGET: ${{ inputs.target }}
+          SOURCE_DIR: ${{ inputs.source_dir }}
+          PAGES_PROJECT: ${{ inputs.pages_project }}
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "$TARGET" == "homepage" ]]; then
-            dir="apps/homepage"
-            project="vossbot-preview-homepage"
-          else
-            dir="apps/lab"
-            project="vossbot-preview-lab"
-          fi
+          case "$TARGET" in
+            homepage) default_dir="apps/homepage"; default_project="vossbot-preview-homepage" ;;
+            lab) default_dir="apps/lab"; default_project="vossbot-preview-lab" ;;
+            *) echo "Invalid target" >&2; exit 1 ;;
+          esac
+          dir="${SOURCE_DIR:-$default_dir}"
+          project="${PAGES_PROJECT:-$default_project}"
+          if [[ ! "$project" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then echo "Invalid project name" >&2; exit 1; fi
+          if [[ "$project" != *preview* ]]; then echo "Only preview projects allowed" >&2; exit 1; fi
+          if [[ "$dir" == /* || "$dir" == *..* ]]; then echo "Invalid source directory" >&2; exit 1; fi
           test -f "$dir/index.html"
           npx --yes wrangler@4 pages deploy "$dir" --project-name="$project" --branch=main
