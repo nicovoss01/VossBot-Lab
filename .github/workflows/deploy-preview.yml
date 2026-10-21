@@ -1,0 +1,51 @@
+name: Deploy VoßBot experiment to Cloudflare Pages
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Which experiment to publish?"
+        required: true
+        type: choice
+        options: [homepage, lab]
+  workflow_call:
+    inputs:
+      target:
+        required: true
+        type: string
+    secrets:
+      CLOUDFLARE_API_TOKEN:
+        required: true
+      CLOUDFLARE_ACCOUNT_ID:
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: preview-${{ inputs.target }}
+  cancel-in-progress: true
+jobs:
+  publish:
+    if: ${{ inputs.target == 'homepage' || inputs.target == 'lab' }}
+    runs-on: ubuntu-latest
+    environment: sandbox-preview
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Deploy independent preview (never live Sandbox)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TARGET: ${{ inputs.target }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$TARGET" == "homepage" ]]; then
+            dir="apps/homepage"
+            project="vossbot-preview-homepage"
+          else
+            dir="apps/lab"
+            project="vossbot-preview-lab"
+          fi
+          test -f "$dir/index.html"
+          npx --yes wrangler@4 pages deploy "$dir" --project-name="$project" --branch=main
