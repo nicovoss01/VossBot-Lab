@@ -1,0 +1,39 @@
+# Secrets and environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+service-account*.json
+firebase-adminsdk*.json
+secrets/
+.secret/
+
+# Dependencies and generated output
+node_modules/
+dist/
+build/
+coverage/
+.cache/
+.tmp/
+
+# Local/editor/system files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.log
+
+# Local data / backups
+*.sqlite
+*.sqlite3
+*.db
+*.bak
+*.backup
+backups/
+
+# Official Project-only page; keep it out of the Sandbox repository.
+/android-login.html
