@@ -1,22 +1,24 @@
-﻿# Environment names and domain mapping (2026-10-22)
+﻿# VoßFit environments and ownership (2026-10-22)
 
-All three environments have their own main site and Lab workbench.
-
-| Environment | Main site | Lab workbench |
+| Environment | Workbench (Lab) | Test homepage |
 | --- | --- | --- |
-| Project (untouched) | vossfit.de | lab.vossfit.de |
-| Sandbox | voßfit.de (xn--vofit-mqa.de) | lab.voßfit.de (lab.xn--vofit-mqa.de) |
-| Playground | bot.voßfit.de (bot.xn--vofit-mqa.de) | lab.bot.voßfit.de (lab.bot.xn--vofit-mqa.de) |
+| Official Project - OUT OF SCOPE | lab.vossfit.de | vossfit.de |
+| Sandbox | lab.voßfit.de / lab.xn--vofit-mqa.de | voßfit.de / xn--vofit-mqa.de |
+| Playground | bot.voßfit.de / bot.xn--vofit-mqa.de | lab.bot.voßfit.de / lab.bot.xn--vofit-mqa.de |
 
-## Release boundaries
-- Playground Lab edits and tests Playground only. Once saved/published, changes appear on bot.voßfit.de.
-- Promotion Playground -> Sandbox is explicit, backed up, tested and reversible; never automatic.
-- Sandbox Lab edits and stages Sandbox main site; its release to voßfit.de is separate.
-- The official Project and Project Lab are completely out of scope. No deployment, DNS or API edits there.
-- Share sandbox infrastructure only when permission checks and data namespaces are isolated. Never publish server secrets in Git.
+**Important:** bot.voßfit.de serves the VoßBot OS workbench, NOT the VoßFit homepage. lab.bot.voßfit.de serves the test homepage, NOT the workbench. The official Project is never changed here.
 
-## Current verified status
-- bot.voßfit.de already maps to Cloudflare Pages project vossbot-preview-lab.
-- lab.bot.voßfit.de is not yet configured in the observed DNS/Pages inventory.
-- GitHub repository nicovoss01/VossBot-Lab is public. The existing worktree has uncommitted changes which must be preserved.
-- This document records target architecture, not a claim of completed deployment or authentication tests.
+## Editing and promotion
+- The Playground workbench edits/stages the Playground test homepage. The visible Playground homepage can update immediately after a saved preview, with version history and rollback.
+- Promotion from Playground to Sandbox is explicit, reviewed and reversible; never automatic.
+- Sandbox workbench separately stages the Sandbox homepage.
+- Never automatically deploy Playground changes to the Sandbox or Project.
+- Frontend/UI ownership: other chat (layout, windows, buttons, direct tap/click behavior).
+- Infrastructure ownership: this chat (repository, auth, data, API, storage, preview/release pipeline).
+- Coordinate through docs/TEAM-HANDOFF.md and separate branches/PRs; no assumption of live chat-to-chat messaging.
+
+## Observed status
+- Cloudflare Pages vossbot-preview-lab already owns bot.xn--vofit-mqa.de, but its actual deployed content must be validated against the desired workbench.
+- lab.bot.xn--vofit-mqa.de was not present in the checked DNS or Pages custom domains.
+- Repository already tracks apps/homepage and apps/lab, but they are NOT verified byte-identical to the current Spaceship-hosted Sandbox sites.
+- Never blindly overwrite live sites or import potentially secret-bearing source into this public repository.
