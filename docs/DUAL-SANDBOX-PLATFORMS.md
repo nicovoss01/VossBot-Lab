@@ -1,28 +1,22 @@
-﻿# Two independent Sandbox development/release pairs
+﻿# Environment names and domain mapping (2026-10-22)
 
-Domain owner: voßfit.de (xn--vofit-mqa.de). This is NOT the official vossfit.de project.
+All three environments have their own main site and Lab workbench.
 
-## Pair A - Homepage
-- Public Sandbox: https://xn--vofit-mqa.de (Spaceship-hosted).
-- Homepage editor/staging: https://lab.xn--vofit-mqa.de (Spaceship-hosted).
-- Promotion: Lab -> homepage only by explicit approval, with backup, diff, health checks and rollback.
+| Environment | Main site | Lab workbench |
+| --- | --- | --- |
+| Project (untouched) | vossfit.de | lab.vossfit.de |
+| Sandbox | voßfit.de (xn--vofit-mqa.de) | lab.voßfit.de (lab.xn--vofit-mqa.de) |
+| Playground | bot.voßfit.de (bot.xn--vofit-mqa.de) | lab.bot.voßfit.de (lab.bot.xn--vofit-mqa.de) |
 
-## Pair B - VossBot OS
-- Existing preview: https://bot.xn--vofit-mqa.de (Cloudflare Pages vossbot-preview-lab).
-- Proposed editor: https://bot.lab.xn--vofit-mqa.de.
-- Proposed live editor preview: https://page.bot.lab.xn--vofit-mqa.de.
-- Editing the Bot Lab must update its own preview without affecting Pair A.
-- Promotion: Bot Lab preview -> Pair A Lab only by explicit approval, then Pair A Lab -> homepage separately.
-- No automatic cross-pair publication and no writes to official vossfit.de.
+## Release boundaries
+- Playground Lab edits and tests Playground only. Once saved/published, changes appear on bot.voßfit.de.
+- Promotion Playground -> Sandbox is explicit, backed up, tested and reversible; never automatic.
+- Sandbox Lab edits and stages Sandbox main site; its release to voßfit.de is separate.
+- The official Project and Project Lab are completely out of scope. No deployment, DNS or API edits there.
+- Share sandbox infrastructure only when permission checks and data namespaces are isolated. Never publish server secrets in Git.
 
-## Shared services and isolation
-- Use the existing sandbox Firebase auth and Gemini API Worker only after validating the allowed hostnames and token audience.
-- Use server-side secrets only. Never place Gemini secrets, Firebase admin keys or R2 tokens in public Git.
-- Keep a separate namespace/project path for Bot Lab files and preview artifacts; do not let preview writes overwrite live Lab data.
-- Editor and preview require access control. DNS + TLS + Cloudflare Pages custom domains must be verified before announcing a host as live.
-- Existing bot.xn--vofit-mqa.de is a preview, not proof that new hosts are configured.
-
-## Current work status
-- Architecture recorded; DNS for bot.lab and page.bot.lab not yet created.
-- Hosting targets, custom domain validation, access rules, and deployment pipeline not yet configured.
-- Source-of-truth of current Spaceship homepage and Lab must be verified before replacement.
+## Current verified status
+- bot.voßfit.de already maps to Cloudflare Pages project vossbot-preview-lab.
+- lab.bot.voßfit.de is not yet configured in the observed DNS/Pages inventory.
+- GitHub repository nicovoss01/VossBot-Lab is public. The existing worktree has uncommitted changes which must be preserved.
+- This document records target architecture, not a claim of completed deployment or authentication tests.
