@@ -52,5 +52,5 @@ panel.addEventListener('submit',e=>{e.preventDefault();if(e.target.id==='taskFor
 $('labClose').onclick=close;$('labMin').onclick=()=>panel.classList.toggle('minimized');$('labFull').onclick=()=>{full=!full;panel.classList.toggle('fullscreen',full)};launcher.onclick=()=>open(current);
 document.querySelectorAll('#dock button,#mobilebar button,#nav button').forEach(b=>b.addEventListener('click',()=>{const t=b.textContent.trim();const n=modules.find(m=>t.includes(m[0])||m[0].includes(t));if(n)setTimeout(()=>open(n[0]),0)}));
 const oldShow=window.show;document.addEventListener('click',e=>{const b=e.target.closest('.launch,.whead .max');if(b){const name=b.closest('.win')?.id?.replace('win-','');if(name){e.stopPropagation();setTimeout(()=>open(name==='Experimente'?'Ideenlabor':name),0)}}},true);
-window.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('visible'))close()});stamp();
+window.VossLabOpen=open;window.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('visible'))close()});stamp();
 })();
